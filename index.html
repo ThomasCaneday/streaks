@@ -7,6 +7,17 @@
     <meta name="description" content="Track your daily streaks and challenges with friends. Build habits, stay motivated, and never break your streak!" />
     <meta name="theme-color" content="#ff6b35" />
     <title>Streaks - Track Your Daily Challenges</title>
+    <script>
+      // Handle GitHub Pages SPA routing
+      // Extract the path from the query parameter set by 404.html
+      const path = window.location.search.slice(1);
+      if (path) {
+        // Remove the leading slash from the path
+        const route = path.startsWith('/') ? path.slice(1) : path;
+        // Redirect to the proper route
+        window.history.replaceState(null, '', '/' + route + window.location.hash);
+      }
+    </script>
     <script type="module" crossorigin src="/streaks/assets/index-CDY3xs4m.js"></script>
     <link rel="stylesheet" crossorigin href="/streaks/assets/index-aP0QqWzZ.css">
   </head>
