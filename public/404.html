@@ -7,7 +7,15 @@
     <title>Streaks for Anything</title>
     <script>
       // Single Page Apps for GitHub Pages
-      // This script redirects all 404s to index.html with the path as a query parameter
+      // This script takes the current url and converts the path and query
+      // string into just a query string, and then redirects the browser
+      // to the new url with only a query string and hash fragment,
+      // e.g., https://www.foo.tld/one/two?a=b&c=d#qwe, becomes
+      // https://www.foo.tld/?/one/two&a=b~and~c=d#qwe
+      // Note: this 404.html file must be at least 512 bytes for it to work
+      // with Internet Explorer (it is currently > 512 bytes)
+
+      // This script is from: https://github.com/rafgraph/spa-github-pages
       var l = window.location;
       var path = l.pathname;
 
@@ -16,13 +24,18 @@
         path = path.substring('/streaks'.length);
       }
 
-      // Redirect to index.html with the original path
-      l.replace(
-        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-        '/streaks/?/' + path.slice(1) +
-        (l.search ? '&' + l.search.slice(1) : '') +
-        l.hash
-      );
+      // If path is just /streaks or /streaks/, redirect to /streaks/
+      if (path === '/' || path === '') {
+        l.replace(l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') + '/streaks/');
+      } else {
+        // Redirect to index.html with the path as a query parameter
+        l.replace(
+          l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+          '/streaks/?' + path.slice(1).split('/').join('~and~') +
+          (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+          l.hash
+        );
+      }
     </script>
   </head>
   <body>
