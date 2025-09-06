@@ -7,7 +7,7 @@ export interface Challenge {
   ownerUid: string;
   name: string;
   isGroup: boolean;
-  visibility: 'public' | 'unlisted' | 'private';
+  visibility: 'public' | 'private';
   members: string[]; // Changed from object to array
   startDate: Date;
   streakPolicy: { window: 'calendar' | 'rolling24h'; resetHour: number };
@@ -19,7 +19,7 @@ export async function createChallenge(
   user: User,
   name: string,
   isGroup: boolean,
-  visibility: 'public' | 'unlisted' | 'private'
+  visibility: 'public' | 'private'
 ): Promise<string> {
   try {
     const challengeRef = doc(collection(db, 'challenges'));
