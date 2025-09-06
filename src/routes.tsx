@@ -20,8 +20,8 @@ export const getBasename = () => {
     }
   }
   
-  // Default to GitHub Pages basename
-  return '/streaks/'; // normalized with trailing slash
+  // Default to GitHub Pages basename (empty since /streaks is part of the repo path)
+  return '/';
 };
 
 export const router = createBrowserRouter([
