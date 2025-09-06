@@ -11,6 +11,7 @@ import Card from '../components/Card';
 import Button from '../components/Button';
 import Avatar from '../components/Avatar';
 import Badge from '../components/Badge';
+import Toast from '../components/Toast';
 import { motion } from 'framer-motion';
 import type { User } from 'firebase/auth';
 import type { Challenge } from '../lib/challenges';
@@ -31,6 +32,8 @@ export default function ChallengeDetail() {
   const [isMember, setIsMember] = useState(false);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
   const navigate = useNavigate();
 
   const loadChallenge = useCallback(async (challengeId: string) => {
@@ -149,8 +152,8 @@ export default function ChallengeDetail() {
   const handleInvite = () => {
     const shareUrl = `${window.location.origin}/streaks/challenge/${id}`;
     navigator.clipboard.writeText(shareUrl);
-    // TODO: Add toast notification
-    alert('Invite link copied to clipboard!');
+    setToastMessage('Invite link copied to clipboard!');
+    setShowToast(true);
   };
 
   if (loading) {
@@ -277,6 +280,13 @@ export default function ChallengeDetail() {
           </div>
         </motion.div>
       </div>
+      {showToast && (
+        <Toast
+          message={toastMessage}
+          type="success"
+          onClose={() => setShowToast(false)}
+        />
+      )}
     </div>
   );
 }
