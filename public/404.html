@@ -17,16 +17,11 @@
         const path = search.substring(2); // Remove '?/'
         const route = path.startsWith('/') ? path : '/' + path;
 
-        // For GitHub Pages, add the basename
-        if (window.location.hostname.includes('github')) {
-          window.history.replaceState(null, '', '/streaks' + route + window.location.hash);
-        } else {
-          window.history.replaceState(null, '', route + window.location.hash);
-        }
+        // For GitHub Pages project site, the /streaks is already in the URL
+        window.history.replaceState(null, '', route + window.location.hash);
       } else if (pathname.startsWith('/streaks/')) {
-        // Handle direct /streaks/* URLs (new format)
-        const path = pathname.substring('/streaks'.length); // Remove '/streaks'
-        window.history.replaceState(null, '', '/streaks' + path + window.location.hash);
+        // Handle direct /streaks/* URLs - keep the URL as-is since /streaks is the repo path
+        // No changes needed, React Router will handle the routing
       }
     </script>
     <script type="module" crossorigin src="/streaks/assets/index-CO6Wop51.js"></script>
