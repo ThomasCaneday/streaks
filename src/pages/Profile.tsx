@@ -141,7 +141,7 @@ export default function Profile() {
           <Card className="mb-6">
             <div className="text-center mb-6">
               <Avatar
-                src={profile.selectedAvatar ? `/avatars/${profile.selectedAvatar}` : undefined}
+                src={profile.selectedAvatar ? `${import.meta.env.BASE_URL}avatars/${profile.selectedAvatar}` : undefined}
                 size="lg"
                 fallback={profile.username.charAt(0).toUpperCase()}
                 className="mx-auto mb-4"
@@ -209,7 +209,7 @@ export default function Profile() {
                         }`}
                       >
                         <img
-                          src={`/avatars/${avatar}`}
+                          src={`${import.meta.env.BASE_URL}avatars/${avatar}`}
                           alt={`Avatar ${avatar}`}
                           className="w-16 h-16 rounded-full mx-auto"
                         />

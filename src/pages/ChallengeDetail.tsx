@@ -255,7 +255,7 @@ export default function ChallengeDetail() {
               >
                 <Card className="flex items-center space-x-4">
                   <Avatar 
-                    src={member.selectedAvatar ? `/avatars/${member.selectedAvatar}` : undefined}
+                    src={member.selectedAvatar ? `${import.meta.env.BASE_URL}avatars/${member.selectedAvatar}` : undefined}
                     fallback={member.username.charAt(0).toUpperCase()} 
                   />
                   <div className="flex-1">

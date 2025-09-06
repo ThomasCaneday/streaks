@@ -66,7 +66,7 @@ export default function Leaderboard() {
                       {getRankBadge(index + 1)}
                     </div>
                     <Avatar 
-                      src={entry.selectedAvatar ? `/avatars/${entry.selectedAvatar}` : undefined}
+                      src={entry.selectedAvatar ? `${import.meta.env.BASE_URL}avatars/${entry.selectedAvatar}` : undefined}
                       fallback={entry.username.charAt(0).toUpperCase()} 
                     />
                     <div>
