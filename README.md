@@ -42,3 +42,4 @@ A minimal MVP for tracking daily streaks in challenges, built with React, TypeSc
 - Check in daily to maintain streaks.
 - View public leaderboard.
 - Timezone-aware check-ins.
+# Test deployment
