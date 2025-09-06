@@ -31,4 +31,6 @@ export const router = createBrowserRouter([
     path: '/profile',
     element: <Profile />,
   },
-]);
+], {
+  basename: import.meta.env.DEV ? '/' : '/streaks',
+});
