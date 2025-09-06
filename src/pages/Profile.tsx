@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { onAuthChange, logOut } from '../lib/auth';
+import { onAuthChange, logOut, deleteAccount } from '../lib/auth';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import Navbar from '../components/Navbar';
@@ -8,6 +8,7 @@ import Card from '../components/Card';
 import Button from '../components/Button';
 import Avatar from '../components/Avatar';
 import Badge from '../components/Badge';
+import Toast from '../components/Toast';
 import { motion } from 'framer-motion';
 import type { User } from 'firebase/auth';
 
@@ -24,6 +25,9 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [tempProfile, setTempProfile] = useState<ProfileData | null>(null);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('info');
   const navigate = useNavigate();
 
   // Available avatars
@@ -90,10 +94,19 @@ export default function Profile() {
     
     if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
       try {
-        // TODO: Implement account deletion
-        alert('Account deletion not yet implemented');
+        await deleteAccount(user);
+        setToastMessage('Account deleted successfully');
+        setToastType('success');
+        setShowToast(true);
+        // Sign out and redirect after a short delay
+        setTimeout(() => {
+          navigate('/');
+        }, 2000);
       } catch (error) {
         console.error('Error deleting account:', error);
+        setToastMessage('Failed to delete account. Please try again.');
+        setToastType('error');
+        setShowToast(true);
       }
     }
   };
@@ -270,6 +283,13 @@ export default function Profile() {
           </Card>
         </motion.div>
       </div>
+      {showToast && (
+        <Toast
+          message={toastMessage}
+          type={toastType}
+          onClose={() => setShowToast(false)}
+        />
+      )}
     </div>
   );
 }
