@@ -6,7 +6,11 @@ import { db } from '../lib/firebase';
 import { hasCheckedInToday } from '../lib/checkins';
 import Navbar from '../components/Navbar';
 import CheckInButton from '../components/CheckInButton';
-import MemberRow from '../components/MemberRow';
+import Card from '../components/Card';
+import Button from '../components/Button';
+import Avatar from '../components/Avatar';
+import Badge from '../components/Badge';
+import { motion } from 'framer-motion';
 import type { User } from 'firebase/auth';
 import type { Challenge } from '../lib/challenges';
 
@@ -115,19 +119,118 @@ export default function ChallengeDetail() {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (!challenge || !user) return <div>Not found</div>;
+  const handleInvite = () => {
+    const shareUrl = `${window.location.origin}/challenge/${id}`;
+    navigator.clipboard.writeText(shareUrl);
+    // TODO: Add toast notification
+    alert('Invite link copied to clipboard!');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Navbar />
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!challenge || !user) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Navbar />
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">Not found</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar />
-      <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4">{challenge.name}</h1>
-        <CheckInButton challengeId={challenge.id} user={user} onCheckIn={handleCheckIn} disabled={myHasChecked} />
-        <h2 className="text-xl mt-8 mb-4">Members</h2>
-        {members.map((m, i) => (
-          <MemberRow key={i} username={m.username} currentStreak={m.currentStreak} hasCheckedToday={m.hasCheckedToday} />
-        ))}
+      <div className="container mx-auto px-4 py-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+            {challenge.name}
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-300">
+            Keep your streak alive! 🔥
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mb-8"
+        >
+          <Card>
+            <div className="text-center">
+              <CheckInButton
+                challengeId={challenge.id}
+                user={user}
+                onCheckIn={handleCheckIn}
+                disabled={myHasChecked}
+              />
+              {myHasChecked && (
+                <p className="text-green-600 dark:text-green-400 mt-2">
+                  ✅ Checked in today!
+                </p>
+              )}
+            </div>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mb-8"
+        >
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              Members ({members.length})
+            </h2>
+            <Button onClick={handleInvite} variant="secondary">
+              Invite Friends
+            </Button>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {members.map((member, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.1 * index }}
+              >
+                <Card className="flex items-center space-x-4">
+                  <Avatar fallback={member.username.charAt(0).toUpperCase()} />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                      {member.username}
+                    </h3>
+                    <div className="flex items-center space-x-2 mt-1">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        🔥 {member.currentStreak}
+                      </span>
+                      {member.hasCheckedToday && (
+                        <Badge variant="success">Today</Badge>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
       </div>
     </div>
   );

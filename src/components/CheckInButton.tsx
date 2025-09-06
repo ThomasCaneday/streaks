@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { checkIn } from '../lib/checkins';
+import Button from './Button';
+import { motion } from 'framer-motion';
 import type { User } from 'firebase/auth';
 
 interface CheckInButtonProps {
@@ -25,12 +27,18 @@ export default function CheckInButton({ challengeId, user, onCheckIn, disabled }
   };
 
   return (
-    <button
-      onClick={handleCheckIn}
-      disabled={disabled || loading}
-      className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:bg-gray-400"
+    <motion.div
+      whileHover={!disabled ? { scale: 1.05 } : {}}
+      whileTap={!disabled ? { scale: 0.95 } : {}}
     >
-      {loading ? 'Checking In...' : 'Check In'}
-    </button>
+      <Button
+        onClick={handleCheckIn}
+        disabled={disabled || loading}
+        size="lg"
+        className="w-full max-w-xs mx-auto"
+      >
+        {loading ? 'Checking In...' : disabled ? 'Already Checked In' : 'Check In 🔥'}
+      </Button>
+    </motion.div>
   );
 }

@@ -5,8 +5,11 @@ import { getUserChallenges, createChallenge } from '../lib/challenges';
 import { hasCheckedInToday } from '../lib/checkins';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import ChallengeCard from '../components/ChallengeCard';
 import Navbar from '../components/Navbar';
+import Card from '../components/Card';
+import Button from '../components/Button';
+import ProgressBar from '../components/ProgressBar';
+import { motion } from 'framer-motion';
 import type { User } from 'firebase/auth';
 import type { Challenge } from '../lib/challenges';
 
@@ -78,30 +81,99 @@ export default function Dashboard() {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Navbar />
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">Loading...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar />
-      <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4">Your Challenges</h1>
-        <p className="mb-4">Found {challenges.length} challenges</p>
-        <div className="mb-4 space-x-2">
-          <button onClick={handleCreateChallenge} className="bg-blue-600 text-white px-4 py-2 rounded">Create Challenge</button>
-          <button onClick={() => user && loadChallenges(user)} className="bg-gray-600 text-white px-4 py-2 rounded">Refresh Challenges</button>
+      <div className="container mx-auto px-4 py-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            Your Streaks
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-300">
+            Keep the momentum going! 🔥
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {challenges.map((challenge, index) => (
+            <motion.div
+              key={challenge.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+            >
+              <Card className="cursor-pointer" onClick={() => navigate(`/challenge/${challenge.id}`)}>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                  {challenge.name}
+                </h3>
+                <div className="flex items-center justify-center mb-4">
+                  <span className="text-4xl mr-3">🔥</span>
+                  <motion.span
+                    className="text-5xl font-bold text-pink-500"
+                    key={challenge.currentStreak}
+                    initial={{ scale: 1 }}
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {challenge.currentStreak}
+                  </motion.span>
+                </div>
+                <ProgressBar progress={(challenge.currentStreak % 7) * (100 / 7)} className="mb-4" />
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+                  {challenge.hasCheckedToday ? 'Checked in today!' : 'Check in to keep your streak'}
+                </p>
+              </Card>
+            </motion.div>
+          ))}
+
+          {/* Create New Challenge Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: challenges.length * 0.1 }}
+          >
+            <Card className="border-2 border-dashed border-gray-300 dark:border-gray-600 cursor-pointer hover:border-pink-500 dark:hover:border-pink-400" onClick={handleCreateChallenge}>
+              <div className="text-center py-8">
+                <div className="text-6xl mb-4 text-gray-400 dark:text-gray-500">+</div>
+                <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300">
+                  Create New Challenge
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  Start a new streak today
+                </p>
+              </div>
+            </Card>
+          </motion.div>
         </div>
-        {challenges.length === 0 ? (
-          <p>No challenges found. Try creating one!</p>
-        ) : (
-          challenges.map((c) => (
-            <ChallengeCard
-              key={c.id}
-              id={c.id}
-              name={c.name}
-              currentStreak={c.currentStreak}
-              hasCheckedToday={c.hasCheckedToday}
-            />
-          ))
+
+        {challenges.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-12"
+          >
+            <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
+              No challenges yet. Create your first streak!
+            </p>
+            <Button onClick={handleCreateChallenge} size="lg">
+              Get Started
+            </Button>
+          </motion.div>
         )}
       </div>
     </div>
