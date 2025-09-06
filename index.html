@@ -19,10 +19,8 @@
 
         // For GitHub Pages project site, the /streaks is already in the URL
         window.history.replaceState(null, '', route + window.location.hash);
-      } else if (pathname.startsWith('/streaks/')) {
-        // Handle direct /streaks/* URLs - keep the URL as-is since /streaks is the repo path
-        // No changes needed, React Router will handle the routing
       }
+      // For direct URLs, let React Router handle them naturally
     </script>
     <script type="module" crossorigin src="/streaks/assets/index-ht30Gvw0.js"></script>
     <link rel="stylesheet" crossorigin href="/streaks/assets/index-DrndZlgy.css">
