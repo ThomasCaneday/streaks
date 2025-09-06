@@ -5,6 +5,7 @@ export interface LeaderboardEntry {
   username: string;
   challengeName: string;
   currentStreak: number;
+  selectedAvatar?: string;
 }
 
 export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
@@ -34,6 +35,7 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
       username: profile.username,
       challengeName: challenge.name,
       currentStreak: participant.currentStreak,
+      selectedAvatar: profile.selectedAvatar,
     });
   }
 

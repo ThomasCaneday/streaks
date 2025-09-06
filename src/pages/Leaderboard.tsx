@@ -65,7 +65,10 @@ export default function Leaderboard() {
                     <div className="flex items-center space-x-2">
                       {getRankBadge(index + 1)}
                     </div>
-                    <Avatar fallback={entry.username.charAt(0).toUpperCase()} />
+                    <Avatar 
+                      src={entry.selectedAvatar ? `/avatars/${entry.selectedAvatar}` : undefined}
+                      fallback={entry.username.charAt(0).toUpperCase()} 
+                    />
                     <div>
                       <h3 className="font-semibold text-gray-900 dark:text-white">
                         {entry.username}
