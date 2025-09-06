@@ -73,7 +73,7 @@ export default function Dashboard() {
     const name = prompt('Challenge name:');
     if (name && user) {
       try {
-        await createChallenge(user, name, false, 'public');
+        await createChallenge(user, name, false, 'private');
         loadChallenges(user);
       } catch {
         alert('Error creating challenge');

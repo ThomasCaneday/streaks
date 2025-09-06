@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { onAuthChange } from '../lib/auth';
-import { getDoc, doc, setDoc } from 'firebase/firestore';
+import { getDoc, doc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { hasCheckedInToday } from '../lib/checkins';
 import { joinChallenge } from '../lib/challenges';
@@ -156,6 +156,32 @@ export default function ChallengeDetail() {
     setShowToast(true);
   };
 
+  const handleToggleVisibility = async () => {
+    if (!id || !user || !challenge || challenge.ownerUid !== user.uid) return;
+
+    const newVisibility = challenge.visibility === 'public' ? 'private' : 'public';
+    
+    // Confirm when making public
+    if (newVisibility === 'public') {
+      const confirmed = confirm('Making this challenge public will show it on the leaderboard for everyone to see. Are you sure?');
+      if (!confirmed) return;
+    }
+    
+    try {
+      await updateDoc(doc(db, 'challenges', id), {
+        visibility: newVisibility,
+        updatedAt: new Date(),
+      });
+      setChallenge({ ...challenge, visibility: newVisibility });
+      setToastMessage(`Challenge is now ${newVisibility === 'public' ? 'public' : 'private'}!`);
+      setShowToast(true);
+    } catch (error) {
+      console.error('Error updating visibility:', error);
+      setToastMessage('Error updating visibility. Please try again.');
+      setShowToast(true);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -187,12 +213,25 @@ export default function ChallengeDetail() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-            {challenge.name}
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300">
-            {isMember ? 'Keep your streak alive! 🔥' : 'Join this challenge to start your streak! 🔥'}
-          </p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
+                {challenge.name}
+              </h1>
+              <Badge variant={challenge.visibility === 'public' ? 'success' : 'info'}>
+                {challenge.visibility === 'public' ? '🌐 Public' : '🔒 Private'}
+              </Badge>
+            </div>
+            {user && challenge.ownerUid === user.uid && (
+              <Button
+                onClick={handleToggleVisibility}
+                variant="secondary"
+                size="sm"
+              >
+                {challenge.visibility === 'public' ? 'Make Private' : 'Make Public'}
+              </Button>
+            )}
+          </div>
         </motion.div>
 
         <motion.div
