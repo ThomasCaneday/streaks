@@ -4,6 +4,7 @@ import { onAuthChange } from '../lib/auth';
 import { getDoc, doc, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { hasCheckedInToday } from '../lib/checkins';
+import { joinChallenge } from '../lib/challenges';
 import Navbar from '../components/Navbar';
 import CheckInButton from '../components/CheckInButton';
 import Card from '../components/Card';
@@ -26,7 +27,9 @@ export default function ChallengeDetail() {
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
   const [myHasChecked, setMyHasChecked] = useState(false);
+  const [isMember, setIsMember] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [joining, setJoining] = useState(false);
   const navigate = useNavigate();
 
   const loadChallenge = useCallback(async (challengeId: string) => {
@@ -41,6 +44,10 @@ export default function ChallengeDetail() {
       const ch = { id: challengeSnap.id, ...challengeSnap.data() } as Challenge;
       console.log('Challenge loaded:', ch);
       setChallenge(ch);
+
+      // Check if current user is a member
+      const userIsMember = user ? ch.members.includes(user.uid) : false;
+      setIsMember(userIsMember);
 
       // Load members
       const memberUids = ch.members; // members is now an array
@@ -65,8 +72,8 @@ export default function ChallengeDetail() {
       console.log('Member profiles loaded:', profiles);
       setMembers(profiles);
       
-      // Check if current user has checked in today
-      if (user) {
+      // Check if current user has checked in today (only if member)
+      if (user && userIsMember) {
         const checked = await hasCheckedInToday(challengeId, user);
         setMyHasChecked(checked);
       }
@@ -119,6 +126,23 @@ export default function ChallengeDetail() {
     }
   };
 
+  const handleJoin = async () => {
+    if (!id || !user || !challenge) return;
+    
+    setJoining(true);
+    try {
+      await joinChallenge(id, user);
+      setIsMember(true);
+      // Reload challenge data to get updated member list
+      await loadChallenge(id);
+    } catch (error) {
+      console.error('Error joining challenge:', error);
+      alert('Error joining challenge. Please try again.');
+    } finally {
+      setJoining(false);
+    }
+  };
+
   const handleInvite = () => {
     const shareUrl = `${window.location.origin}/challenge/${id}`;
     navigator.clipboard.writeText(shareUrl);
@@ -161,7 +185,7 @@ export default function ChallengeDetail() {
             {challenge.name}
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300">
-            Keep your streak alive! 🔥
+            {isMember ? 'Keep your streak alive! 🔥' : 'Join this challenge to start your streak! 🔥'}
           </p>
         </motion.div>
 
@@ -173,16 +197,29 @@ export default function ChallengeDetail() {
         >
           <Card>
             <div className="text-center">
-              <CheckInButton
-                challengeId={challenge.id}
-                user={user}
-                onCheckIn={handleCheckIn}
-                disabled={myHasChecked}
-              />
-              {myHasChecked && (
-                <p className="text-green-600 dark:text-green-400 mt-2">
-                  ✅ Checked in today!
-                </p>
+              {isMember ? (
+                <>
+                  <CheckInButton
+                    challengeId={challenge.id}
+                    user={user}
+                    onCheckIn={handleCheckIn}
+                    disabled={myHasChecked}
+                  />
+                  {myHasChecked && (
+                    <p className="text-green-600 dark:text-green-400 mt-2">
+                      ✅ Checked in today!
+                    </p>
+                  )}
+                </>
+              ) : (
+                <>
+                  <p className="text-gray-600 dark:text-gray-300 mb-4">
+                    Join this challenge to start your streak!
+                  </p>
+                  <Button onClick={handleJoin} disabled={joining}>
+                    {joining ? 'Joining...' : 'Join Challenge'}
+                  </Button>
+                </>
               )}
             </div>
           </Card>
@@ -198,9 +235,11 @@ export default function ChallengeDetail() {
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
               Members ({members.length})
             </h2>
-            <Button onClick={handleInvite} variant="secondary">
-              Invite Friends
-            </Button>
+            {isMember && (
+              <Button onClick={handleInvite} variant="secondary">
+                Invite Friends
+              </Button>
+            )}
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
