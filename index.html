@@ -10,12 +10,19 @@
     <script>
       // Handle GitHub Pages SPA routing
       // Extract the path from the query parameter set by 404.html
-      const path = window.location.search.slice(1);
-      if (path) {
-        // Remove the leading slash from the path
-        const route = path.startsWith('/') ? path.slice(1) : path;
-        // Redirect to the proper route
-        window.history.replaceState(null, '', '/' + route + window.location.hash);
+      const search = window.location.search;
+      if (search && search.startsWith('?/')) {
+        // Remove the leading '?/' to get the actual path
+        const path = search.substring(2); // Remove '?/'
+        const route = path.startsWith('/') ? path : '/' + path;
+
+        // For production, ensure the route includes the basename
+        const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+        if (isProduction && !route.startsWith('/streaks')) {
+          window.history.replaceState(null, '', '/streaks' + route + window.location.hash);
+        } else {
+          window.history.replaceState(null, '', route + window.location.hash);
+        }
       }
     </script>
   </head>
