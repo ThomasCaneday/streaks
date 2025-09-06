@@ -15,6 +15,7 @@ interface ProfileData {
   username: string;
   currentTimezone: string;
   avatarUrl?: string;
+  selectedAvatar?: string;
 }
 
 export default function Profile() {
@@ -24,6 +25,13 @@ export default function Profile() {
   const [editing, setEditing] = useState(false);
   const [tempProfile, setTempProfile] = useState<ProfileData | null>(null);
   const navigate = useNavigate();
+
+  // Available avatars
+  const availableAvatars = [
+    'avatar_0_0.png', 'avatar_0_1.png', 'avatar_0_2.png',
+    'avatar_1_0.png', 'avatar_1_1.png', 'avatar_1_2.png',
+    'avatar_2_0.png', 'avatar_2_1.png', 'avatar_2_2.png'
+  ];
 
   useEffect(() => {
     const unsubscribe = onAuthChange((u) => {
@@ -133,6 +141,7 @@ export default function Profile() {
           <Card className="mb-6">
             <div className="text-center mb-6">
               <Avatar
+                src={profile.selectedAvatar ? `/avatars/${profile.selectedAvatar}` : undefined}
                 size="lg"
                 fallback={profile.username.charAt(0).toUpperCase()}
                 className="mx-auto mb-4"
@@ -182,6 +191,41 @@ export default function Profile() {
                   <p className="text-gray-900 dark:text-white">{profile.currentTimezone}</p>
                 )}
               </div>
+
+              {editing && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    Choose Avatar
+                  </label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {availableAvatars.map((avatar) => (
+                      <button
+                        key={avatar}
+                        onClick={() => setTempProfile(prev => prev ? { ...prev, selectedAvatar: avatar } : null)}
+                        className={`relative p-2 rounded-lg border-2 transition-all ${
+                          tempProfile?.selectedAvatar === avatar
+                            ? 'border-pink-500 bg-pink-50 dark:bg-pink-900/20'
+                            : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+                        }`}
+                      >
+                        <img
+                          src={`/avatars/${avatar}`}
+                          alt={`Avatar ${avatar}`}
+                          className="w-16 h-16 rounded-full mx-auto"
+                        />
+                        {tempProfile?.selectedAvatar === avatar && (
+                          <div className="absolute -top-1 -right-1 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center">
+                            <span className="text-white text-xs">✓</span>
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    Click on an avatar to select it
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="flex space-x-4 mt-6">

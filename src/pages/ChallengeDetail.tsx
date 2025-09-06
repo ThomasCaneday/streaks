@@ -19,6 +19,7 @@ interface Member {
   username: string;
   currentStreak: number;
   hasCheckedToday: boolean;
+  selectedAvatar?: string;
 }
 
 export default function ChallengeDetail() {
@@ -62,10 +63,12 @@ export default function ChallengeDetail() {
           const username = profileSnap.exists() && profileSnap.data()?.username 
             ? profileSnap.data()!.username 
             : `User ${uid.slice(0, 8)}`;
+          const selectedAvatar = profileSnap.exists() ? profileSnap.data()?.selectedAvatar : undefined;
           return {
             username,
             currentStreak: participantSnap.exists() ? participantSnap.data()?.currentStreak || 0 : 0,
             hasCheckedToday: hasChecked,
+            selectedAvatar,
           };
         })
       );
@@ -251,7 +254,10 @@ export default function ChallengeDetail() {
                 transition={{ duration: 0.3, delay: 0.1 * index }}
               >
                 <Card className="flex items-center space-x-4">
-                  <Avatar fallback={member.username.charAt(0).toUpperCase()} />
+                  <Avatar 
+                    src={member.selectedAvatar ? `/avatars/${member.selectedAvatar}` : undefined}
+                    fallback={member.username.charAt(0).toUpperCase()} 
+                  />
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900 dark:text-white">
                       {member.username}
