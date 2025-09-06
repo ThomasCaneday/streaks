@@ -2,7 +2,7 @@
 <html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/streaks/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Track your daily streaks and challenges with friends. Build habits, stay motivated, and never break your streak!" />
     <meta name="theme-color" content="#ff6b35" />
@@ -10,21 +10,22 @@
     <script>
       // Handle SPA routing for different hosting platforms
       const search = window.location.search;
+      const pathname = window.location.pathname;
+
       if (search && search.startsWith('?/')) {
-        // This is from a 404 redirect (GitHub Pages)
+        // This is from a 404 redirect (GitHub Pages) - old format
         const path = search.substring(2); // Remove '?/'
         const route = path.startsWith('/') ? path : '/' + path;
-        
-        // For GitHub Pages, add the basename
-        if (window.location.hostname.includes('github')) {
-          window.history.replaceState(null, '', '/streaks' + route + window.location.hash);
-        } else {
-          window.history.replaceState(null, '', route + window.location.hash);
-        }
+
+        // For GitHub Pages project site, the /streaks is already in the URL
+        window.history.replaceState(null, '', route + window.location.hash);
+      } else if (pathname.startsWith('/streaks/')) {
+        // Handle direct /streaks/* URLs - keep the URL as-is since /streaks is the repo path
+        // No changes needed, React Router will handle the routing
       }
     </script>
-    <script type="module" crossorigin src="/streaks/assets/index-DJk0mka2.js"></script>
-    <link rel="stylesheet" crossorigin href="/streaks/assets/index-DrndZlgy.css">
+    <script type="module" crossorigin src="/assets/index-BRd2qyqz.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DrndZlgy.css">
   </head>
   <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white">
     <div id="root"></div>
