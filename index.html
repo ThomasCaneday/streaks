@@ -8,6 +8,14 @@
     <meta name="theme-color" content="#ff6b35" />
     <title>Streaks - Track Your Daily Challenges</title>
     <script>
+      // Set base URL for production
+      if (window.location.hostname.includes('github')) {
+        const base = document.createElement('base');
+        base.href = '/streaks/';
+        document.head.appendChild(base);
+      }
+    </script>
+    <script>
       // Handle SPA routing for different hosting platforms
       const search = window.location.search;
       if (search && search.startsWith('?/')) {
