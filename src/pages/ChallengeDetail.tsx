@@ -148,7 +148,9 @@ export default function ChallengeDetail() {
   };
 
   const handleInvite = () => {
-    const shareUrl = `${window.location.origin}${getBasename()}/challenge/${id}`;
+    const basename = getBasename();
+    const path = `/challenge/${id}`;
+    const shareUrl = `${window.location.origin}${basename}${path}`;
     navigator.clipboard.writeText(shareUrl);
     // TODO: Add toast notification
     alert('Invite link copied to clipboard!');
