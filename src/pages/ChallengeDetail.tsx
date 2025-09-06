@@ -5,7 +5,6 @@ import { getDoc, doc, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { hasCheckedInToday } from '../lib/checkins';
 import { joinChallenge } from '../lib/challenges';
-import { getBasename } from '../routes';
 import Navbar from '../components/Navbar';
 import CheckInButton from '../components/CheckInButton';
 import Card from '../components/Card';
@@ -148,9 +147,7 @@ export default function ChallengeDetail() {
   };
 
   const handleInvite = () => {
-    const basename = getBasename();
-    const path = `/challenge/${id}`;
-    const shareUrl = `${window.location.origin}${basename}${path}`;
+    const shareUrl = `${window.location.origin}/challenge/${id}`;
     navigator.clipboard.writeText(shareUrl);
     // TODO: Add toast notification
     alert('Invite link copied to clipboard!');

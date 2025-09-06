@@ -6,24 +6,6 @@ import ChallengeDetail from './pages/ChallengeDetail';
 import Leaderboard from './pages/Leaderboard';
 import Profile from './pages/Profile';
 
-// Determine basename based on hosting platform
-export const getBasename = () => {
-  if (import.meta.env.DEV) return '/';
-  
-  // Check if we're on Firebase hosting
-  if (typeof window !== 'undefined') {
-    if (window.location.hostname.includes('firebase') || 
-        window.location.hostname.includes('web.app') ||
-        window.location.hostname === 'streaks-b68de.web.app' ||
-        window.location.hostname === 'streaks-b68de.firebaseapp.com') {
-      return '/';
-    }
-  }
-  
-  // Default to GitHub Pages basename (empty since /streaks is part of the repo path)
-  return '/';
-};
-
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -49,6 +31,4 @@ export const router = createBrowserRouter([
     path: '/profile',
     element: <Profile />,
   },
-], {
-  basename: getBasename(),
-});
+]);
