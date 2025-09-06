@@ -7,7 +7,7 @@ import Leaderboard from './pages/Leaderboard';
 import Profile from './pages/Profile';
 
 // Determine basename based on hosting platform
-const getBasename = () => {
+export const getBasename = () => {
   if (import.meta.env.DEV) return '/';
   
   // Check if we're on Firebase hosting
