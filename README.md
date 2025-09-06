@@ -45,3 +45,4 @@ A minimal MVP for tracking daily streaks in challenges, built with React, TypeSc
 # Test deployment
 # Trigger rebuild
 # Force rebuild
+# Manual trigger
