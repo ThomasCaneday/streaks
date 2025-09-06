@@ -21,7 +21,7 @@ export const getBasename = () => {
   }
   
   // Default to GitHub Pages basename
-  return '/streaks';
+  return '/streaks/'; // normalized with trailing slash
 };
 
 export const router = createBrowserRouter([
