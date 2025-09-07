@@ -23,7 +23,7 @@ export default function Dashboard() {
     try {
       const ch = await getUserChallenges(u);
       const withCheckins = await Promise.all(
-        ch.map(async (c) => {
+        ch.map(async (c: Challenge) => {
           const hasChecked = await hasCheckedInToday(c.id, u);
           // Fetch current streak from participant document
           let currentStreak = 0;

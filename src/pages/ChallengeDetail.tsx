@@ -4,7 +4,7 @@ import { onAuthChange } from '../lib/auth';
 import { getDoc, doc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { hasCheckedInToday } from '../lib/checkins';
-import { joinChallenge } from '../lib/challenges';
+import { joinChallenge, generateInviteToken } from '../lib/challenges';
 import Navbar from '../components/Navbar';
 import CheckInButton from '../components/CheckInButton';
 import Card from '../components/Card';
@@ -149,11 +149,20 @@ export default function ChallengeDetail() {
     }
   };
 
-  const handleInvite = () => {
-    const shareUrl = `${window.location.origin}/streaks/challenge/${id}`;
-    navigator.clipboard.writeText(shareUrl);
-    setToastMessage('Invite link copied to clipboard!');
-    setShowToast(true);
+  const handleInvite = async () => {
+    if (!id || !user) return;
+    
+    try {
+      const token = await generateInviteToken(id, user);
+      const shareUrl = `${window.location.origin}/streaks/invite/${token}`;
+      navigator.clipboard.writeText(shareUrl);
+      setToastMessage('Invite link copied to clipboard!');
+      setShowToast(true);
+    } catch (error) {
+      console.error('Error generating invite:', error);
+      setToastMessage('Error generating invite link');
+      setShowToast(true);
+    }
   };
 
   const handleToggleVisibility = async () => {

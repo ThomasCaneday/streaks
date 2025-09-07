@@ -90,14 +90,87 @@ export async function joinChallenge(challengeId: string, user: User): Promise<vo
   }
 }
 
+export async function generateInviteToken(challengeId: string, user: User): Promise<string> {
+  try {
+    console.log('Generating invite token for user:', user.uid, 'challenge:', challengeId);
+    
+    // Check if user is authenticated
+    if (!user || !user.uid) {
+      throw new Error('User not authenticated');
+    }
+    
+    const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    console.log('Generated token:', token);
+    
+    const inviteRef = doc(collection(db, 'invites'));
+    const inviteData = {
+      token,
+      challengeId,
+      createdBy: user.uid,
+      createdAt: new Date(),
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    };
+    
+    console.log('Creating invite document with data:', inviteData);
+    
+    // Try to create the document, with a small delay if needed
+    let attempts = 0;
+    const maxAttempts = 3;
+    
+    while (attempts < maxAttempts) {
+      try {
+        await setDoc(inviteRef, inviteData);
+        console.log('Invite token created successfully');
+        return token;
+      } catch (error) {
+        attempts++;
+        console.warn(`Attempt ${attempts} failed:`, error);
+        
+        if (attempts >= maxAttempts) {
+          throw error;
+        }
+        
+        // Wait a bit before retrying
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+    
+    throw new Error('Failed to create invite token after multiple attempts');
+  } catch (error) {
+    console.error('Error generating invite token:', error);
+    console.error('Error details:', {
+      user: user ? user.uid : 'no user',
+      challengeId
+    });
+    throw error;
+  }
+}
+
+export async function getChallengeFromInviteToken(token: string): Promise<string | null> {
+  try {
+    const q = query(collection(db, 'invites'), where('token', '==', token));
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) return null;
+    
+    const invite = querySnapshot.docs[0].data();
+    if (new Date() > invite.expiresAt.toDate()) return null; // Expired
+    
+    return invite.challengeId;
+  } catch (error) {
+    console.error('Error getting challenge from token:', error);
+    return null;
+  }
+}
+
 export async function getUserChallenges(user: User): Promise<Challenge[]> {
   try {
     console.log('Getting challenges for user:', user.uid);
-    const q = query(
-      collection(db, 'challenges'),
-      where('members', 'array-contains', user.uid)
-    );
+    console.log('User authenticated:', !!user);
+    console.log('User email:', user.email);
+    
+    const q = query(collection(db, 'challenges'), where('members', 'array-contains', user.uid));
     console.log('Executing query...');
+    
     const querySnapshot = await getDocs(q);
     console.log('Query completed, found', querySnapshot.docs.length, 'challenges');
     
@@ -111,6 +184,11 @@ export async function getUserChallenges(user: User): Promise<Challenge[]> {
     return challenges;
   } catch (error) {
     console.error('Error in getUserChallenges:', error);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      code: (error as { code?: string })?.code || 'Unknown code',
+      user: user ? user.uid : 'no user'
+    });
     throw error;
   }
 }
