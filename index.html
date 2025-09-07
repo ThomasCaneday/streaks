@@ -8,21 +8,19 @@
     <meta name="theme-color" content="#ff6b35" />
     <title>Streaks - Track Your Daily Challenges</title>
     <script>
-      // Handle SPA routing for different hosting platforms
-      const search = window.location.search;
-      const pathname = window.location.pathname;
-
-      if (search && search.startsWith('?/')) {
-        // This is from a 404 redirect (GitHub Pages) - old format
-        const path = search.substring(2); // Remove '?/'
-        const route = path.startsWith('/') ? path : '/' + path;
-
-        // For GitHub Pages project site, the /streaks is already in the URL
-        window.history.replaceState(null, '', route + window.location.hash);
-      }
-      // For direct URLs, let React Router handle them naturally
+      (function() {
+        var l = window.location;
+        // If redirected from 404.html, the path is encoded in the query like "?/real/path"
+        if (l.search[1] === '/') {
+          var decoded = l.search.slice(1).split('&').map(function(s){
+            return s.replace(/~and~/g, '&');
+          }).join('?');
+          var url = l.pathname.replace(/\/$/, '') + decoded + l.hash;
+          window.history.replaceState(null, null, url);
+        }
+      })();
     </script>
-    <script type="module" crossorigin src="/streaks/assets/index-DQsXkAUA.js"></script>
+    <script type="module" crossorigin src="/streaks/assets/index-BCCdzvVT.js"></script>
     <link rel="stylesheet" crossorigin href="/streaks/assets/index-CDakSP3a.css">
   </head>
   <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white">
